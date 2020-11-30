@@ -13,14 +13,16 @@ import Item from './Item';
 import { CardMedia } from '@material-ui/core';
 import { withStyles } from '@material-ui/styles';
 import PutawayTote from './PutawayTote';
-import LoadingIndicator from './LoadingIndicator'
+import LoadingIndicator from './LoadingIndicator';
+import ConfirmBtn from './ConfirmBtn';
 import {useGlobalState} from '../App';
+import AlertDialog from './DialogModal'
 
 const useStyles = theme => ({
     root: {
             marginRight: 8,
             "& .MuiInputBase-root.Mui-disabled": {
-            color: "rgba(0, 0, 0, 1)" // (default alpha is 0.38)
+            color: "rgba(0, 0, 0, 0.9)" // (default alpha is 0.38)
             }
         }
     });
@@ -28,19 +30,7 @@ const useStyles = theme => ({
 const Decanting = React.memo(() => {
 
     const [state, dispatch] = useGlobalState();
-    //const unitsPerToteRef = useRef(null);
-    // useEffect(()=>{
-    //     unitsPerToteRef.current.focus();
-    //     unitsPerToteRef.current.selectionStart = 2
-
-    //  },[])
-    console.log("test123");
-    
-    const callbackRef = useCallback(inputElement => {
-        if (inputElement && state.itemDescription != null) {
-          inputElement.focus();
-        }
-      }, []);
+    const classes = useStyles();
 
     return (
         <Container >
@@ -175,7 +165,7 @@ const Decanting = React.memo(() => {
                             Print
                         </Button>
                     </Box>
-                    <Box sx={{m:1.7 , pt:1}}>
+                    <Box sx={{m:0.6 , pt:0.1}}>
 
                     </Box>
 
@@ -191,8 +181,6 @@ const Decanting = React.memo(() => {
                         }}
                         variant="outlined"
                         value={state.suggestedToteMax}
-                        tabIndex='2'
-                        ref={callbackRef}
                         
                     />
 
@@ -250,13 +238,7 @@ const Decanting = React.memo(() => {
                         
                     />
                 </Grid>
-                <Grid item xs={2}>
-                    <Box sx={{m:1 , pt:1}}>
-                        <Button variant="outlined" color="primary" size="large" >
-                            Confirm
-                        </Button>
-                    </Box>
-                </Grid>
+                <ConfirmBtn />
             </Grid>
         </Container>
         )
@@ -264,4 +246,6 @@ const Decanting = React.memo(() => {
 
 );
 
-export default Decanting;
+
+
+export default withStyles(useStyles)(Decanting); 

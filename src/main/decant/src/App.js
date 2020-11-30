@@ -17,7 +17,8 @@ const initialGlobalState = {
   assetWgt:'',
   wrappingType:'',
   decantingInstructions:'',
-  specialInstructions:''
+  specialInstructions:'',
+  modalDialogOpen: false,
 };
 
 export const GlobalStateContext = React.createContext(initialGlobalState);
