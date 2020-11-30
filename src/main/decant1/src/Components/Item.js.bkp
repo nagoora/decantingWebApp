@@ -1,0 +1,135 @@
+import React, {useEffect, useRef, useState} from 'react';
+import axios from 'axios';
+import TextField from '@material-ui/core/TextField';
+import AuthApi from '../Services/AuthApi'
+import Cookies from 'js-cookie';
+import { trackPromise } from 'react-promise-tracker'
+
+function Item (props) {
+
+    console.log("onItemStateChange " , props.lodnumData);
+
+    const [itemState, setItemState] = useState({
+        ...props.stateData
+
+      });
+
+    const handleStateChange = (updatedState) => {
+        props.onItemStateChange(updatedState)
+    }
+    const Auth = React.useContext(AuthApi);
+
+
+    const handleItemChange =e =>{
+        if(e.target.value!=""){
+          validateItem(e.target.value);
+        }
+    }
+
+    const validateItem = (item) =>{
+      trackPromise(
+        axios.get('/decanting/ws/cws/tosgGetItemQtyOnLodnum?lodnum=' + itemState.lodnum +'&prtnum='+ item +'&wh_id=WIAW',{
+          headers : {
+              'Content-Type': 'application/x-www-form-urlencoded',
+              'Access-Control-Allow-Origin' : 'http://localhost:3000',
+              'Access-Control-Allow-Credentials' : true
+          },withCredentials: true ,
+          credentials: 'include',
+      }).then((response) =>{
+            if(response.data.response.prtnum ){
+              const updatedState = {
+                ...props.stateData,
+                  item: response.data.response.prtnum,
+                  itemError :false,
+                  itemDescription: response.data.response.item_description,
+                  itemImage:response.data.response.img_src,
+                  untcas : response.data.response.untcas,
+                  totalUnits: response.data.response.total_units,
+                  destinationZone: response.data.response.movement_zone,
+                  suggestedTote: response.data.response.tote,
+                  suggestedToteMax: response.data.response.suggested_max_units
+                };
+                
+
+                setItemState(updatedState);
+                handleStateChange(updatedState);
+  
+              }else{
+                  /*setLodnum(srclpn);
+                  setErrorState(true);
+                  setErrorText("Invalid Source Pallet LPN");*/
+                  console.log("ERROR ELSE PART");
+                  const updatedState = {
+                    ...props.stateData,
+                      item:'',
+                      itemError :false,
+                      itemDescription:'',
+                      itemImage:'',
+                      ustcas:'',
+                      totalUnits:'',
+                      destinationZone:'',
+                      suggestedTote : '',
+                      suggestedToteMax:'',
+                    };
+
+                  setItemState(updatedState);
+                  handleStateChange(updatedState);
+              }
+              
+              })
+          .catch((error) => {
+              console.log("ERROR CATCH PART" + error);
+              const updatedState = {
+                ...props.stateData,
+                  item:'',
+                  itemError :false,
+                  itemDescription:'',
+                  itemImage:'',
+                  ustcas:'',
+                  totalUnits:'',
+                  destinationZone:'',
+                  suggestedTote : '',
+                  suggestedToteMax:'',
+                };
+              
+                setItemState(updatedState);
+                handleStateChange(updatedState);
+
+              /* if (error.response) {
+                 setLodnum(srclpn);
+                  setErrorState(true);
+                  setErrorText("Invalid Source Pallet LPN");
+
+                  Cookies.set("user", "loginfalse");
+                   if(error.response.status===401){
+                       Auth.setAuth(false);
+                      Cookies.remove("user");
+                   }
+                }*/
+              })
+      )
+
+    }
+
+    return(
+        <TextField
+        id="item"
+        label="Item"
+        style={{ margin: 8 }}
+        fullWidth
+        margin="normal"
+        InputLabelProps={{
+            shrink: true,
+        }}
+        variant="outlined"
+        required
+        onBlur={handleItemChange}
+        error={itemState.errorState}
+        helperText={itemState.errorText}
+
+    />
+
+    );
+}
+
+export default Item;
