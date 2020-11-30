@@ -31,14 +31,14 @@ const SourceLpn = React.memo(() => {
                 dispatch({ lodnum: response.data.response.lodnum, lodnumError:false })
     
                 }else{
-                    dispatch({ srclpn, lodnumError:true })
+                    dispatch({ lodnum:srclpn, lodnumError:true })
                 }
                 
                 })
             .catch((error) => {
 
                     console.log("error " , error)
-                    dispatch({ srclpn, lodnumError:true })
+                    dispatch({ lodnum:srclpn, lodnumError:true })
 
                 }))
         

@@ -14,6 +14,25 @@ const Item = React.memo(() => {
     const handleItemChange =e =>{
         if(e.target.value!=""){
           validateItem(e.target.value);
+          
+        }else{
+            dispatch(
+                {
+                    item:e.target.value,
+                    itemError :true,
+                    itemDescription:'',
+                    itemImage:'',
+                    ustcas:'',
+                    totalUnits:'',
+                    destinationZone:'',
+                    suggestedTote : '',
+                    suggestedToteMax:'',
+                    assetWgt: '',
+                    wrappingType: '',
+                    decantingInstructions:'',
+                    specialInstructions: ''
+              }
+            )
         }
     }
 
@@ -47,6 +66,12 @@ const Item = React.memo(() => {
                         specialInstructions: response.data.response.special_instructions
                     }
                 )
+                debugger;
+                if(parseInt(response.data.response.suggested_max_units) > parseInt(response.data.response.total_units)){
+                    console.log("state.totalUnits ", state.totalUnits)
+                    console.log("state.suggestedToteMax ", state.suggestedToteMax)
+                    dispatch({ suggestedToteMaxError:true, suggestedToteMaxErrorMsg: "Cannot move qty greater than Total Units" })
+                }
     
                 }else{
                     dispatch(

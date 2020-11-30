@@ -14,11 +14,16 @@ const initialGlobalState = {
   destinationZone:'',
   suggestedTote:'',
   suggestedToteMax:'',
+  suggestedToteMaxError: false,
+  suggestedToteMaxErrorMsg:'',
   assetWgt:'',
   wrappingType:'',
   decantingInstructions:'',
   specialInstructions:'',
   modalDialogOpen: false,
+  destinationLpn:'',
+  destinationLpnError:false,
+  destinationLpnErrorMsg:''
 };
 
 export const GlobalStateContext = React.createContext(initialGlobalState);

@@ -16,7 +16,7 @@ import PutawayTote from './PutawayTote';
 import LoadingIndicator from './LoadingIndicator';
 import ConfirmBtn from './ConfirmBtn';
 import {useGlobalState} from '../App';
-import AlertDialog from './DialogModal'
+import SuggestedMax from './SuggestedMax'
 
 const useStyles = theme => ({
     root: {
@@ -169,20 +169,7 @@ const Decanting = React.memo(() => {
 
                     </Box>
 
-                    <TextField
-                        id="units-per-tote"
-                        name="unitsPerTote"
-                        label="Suggested Units Per Tote"
-                        style={{ margin: 8, cursor: 'text'}}
-                        fullWidth
-                        margin="normal"
-                        InputLabelProps={{
-                            shrink: true,
-                        }}
-                        variant="outlined"
-                        value={state.suggestedToteMax}
-                        
-                    />
+                    <SuggestedMax />
 
                     <FormLabel component="legend">Tote Level</FormLabel>
                     <RadioGroup row aria-label="Tote Level" name="tote-level">
