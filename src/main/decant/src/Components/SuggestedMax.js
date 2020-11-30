@@ -1,11 +1,12 @@
 
-import React from 'react';
+import React, {useEffect, useRef} from 'react';
 import TextField from '@material-ui/core/TextField';
 import {useGlobalState} from '../App';
 
 const SuggestedMax = React.memo(() => {
 
     const [state, dispatch] = useGlobalState();
+    let textInput = useRef(null);
 
     const handleSuggestedMaxChange =(e) => {
         if(parseInt(e.target.value) > parseInt(state.totalUnits)){
@@ -15,6 +16,12 @@ const SuggestedMax = React.memo(() => {
         }
 
     }
+
+    useEffect(() =>{
+        console.log(" useEffect of SuggestedMax gets called")
+        textInput.current.focus();
+        
+    },[state.item]);
 
     return(
         <TextField
@@ -34,6 +41,7 @@ const SuggestedMax = React.memo(() => {
             helperText={state.suggestedToteMaxErrorMsg}
             onChange={handleSuggestedMaxChange}
             onBlur={handleSuggestedMaxChange}
+            inputRef={textInput}
             
         />
     )
