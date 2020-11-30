@@ -66,7 +66,7 @@ const Item = React.memo(() => {
                         specialInstructions: response.data.response.special_instructions
                     }
                 )
-                debugger;
+
                 if(parseInt(response.data.response.suggested_max_units) > parseInt(response.data.response.total_units)){
                     console.log("state.totalUnits ", state.totalUnits)
                     console.log("state.suggestedToteMax ", state.suggestedToteMax)
@@ -133,6 +133,8 @@ const Item = React.memo(() => {
         onBlur={handleItemChange}
         error={state.itemError}
         helperText={state.itemError ? 'Invalid Item' : ''}
+        value={state.item}
+        onChange={handleItemChange}
 
     />
 

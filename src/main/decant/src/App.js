@@ -3,6 +3,7 @@ import Decanting from './Components/Decanting'
 import * as React from "react";
 
 const initialGlobalState = {
+  warehouseId: 'WIAW',
   lodnum:'',
   lodnumError: false,
   item:'',
@@ -23,7 +24,11 @@ const initialGlobalState = {
   modalDialogOpen: false,
   destinationLpn:'',
   destinationLpnError:false,
-  destinationLpnErrorMsg:''
+  destinationLpnErrorMsg:'',
+  toteLevel:'',
+  successModal:false,
+  errorModal:false,
+  errorMessage:''
 };
 
 export const GlobalStateContext = React.createContext(initialGlobalState);

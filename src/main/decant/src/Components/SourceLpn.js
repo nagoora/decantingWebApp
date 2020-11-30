@@ -60,6 +60,9 @@ const SourceLpn = React.memo(() => {
                 error={state.lodnumError}
                 helperText={state.lodnumError ? 'Invalid Source Pallet LPN' : ''}
                 required
+                onChange={handleSourceLpnChange}
+                value={state.lodnum}
+
 
             />
     )

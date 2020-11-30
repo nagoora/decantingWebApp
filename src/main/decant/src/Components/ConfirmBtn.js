@@ -5,13 +5,20 @@ import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
 import {useGlobalState} from '../App';
 import AlertDialog from './DialogModal';
+import SuccessModal from './SuccessModal';
+import ErrorModal from './ErrorModal';
 
 const ConfirmBtn = React.memo(() => {
 
     const [state, dispatch] = useGlobalState();
 
     const handleClickModalOpen = () => {
-        if(!state.lodnumError && !state.itemError){
+        if(!state.destinationLpn){
+            dispatch({destinationLpnError: true, destinationLpnErrorMsg: "Destination LPN required"})
+        }else{
+            dispatch({destinationLpnError: false, destinationLpnErrorMsg: ""})
+        }
+        if(!state.lodnumError && !state.itemError && !state.suggestedToteMaxError && !state.destinationLpnError){
             dispatch({modalDialogOpen: true})
         }
         
@@ -25,6 +32,8 @@ const ConfirmBtn = React.memo(() => {
             </Button>
         </Box>
         <AlertDialog />
+        <SuccessModal />
+        <ErrorModal />
         </Grid>
 
     );

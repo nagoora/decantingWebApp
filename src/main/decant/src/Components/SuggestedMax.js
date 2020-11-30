@@ -18,8 +18,9 @@ const SuggestedMax = React.memo(() => {
     }
 
     useEffect(() =>{
-        console.log(" useEffect of SuggestedMax gets called")
-        textInput.current.focus();
+        if(state.item !== ''){
+            textInput.current.focus();
+        }
         
     },[state.item]);
 

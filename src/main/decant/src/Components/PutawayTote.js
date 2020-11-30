@@ -49,7 +49,6 @@ const PutawayTote = React.memo(() => {
                 label="Suggested Tote*"
                 onChange={handelPutatwayToteChange}
                 value={state.suggestedTote === null ? "" : state.suggestedTote}
-                disabled={loading ? true : undefined} 
                 >
                   {allPutawayTotes.map(tote => {
                       return(

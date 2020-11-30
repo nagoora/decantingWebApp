@@ -1,13 +1,9 @@
-import React, {useRef, useEffect, Component, useCallback} from 'react';
+import React from 'react';
 import TextField from '@material-ui/core/TextField';
 import Container from '@material-ui/core/Container';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
-import Radio from '@material-ui/core/Radio';
-import RadioGroup from '@material-ui/core/RadioGroup';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import FormLabel from '@material-ui/core/FormLabel';
 import SourceLpn from './SourceLpn';
 import Item from './Item';
 import { CardMedia } from '@material-ui/core';
@@ -17,6 +13,8 @@ import LoadingIndicator from './LoadingIndicator';
 import ConfirmBtn from './ConfirmBtn';
 import {useGlobalState} from '../App';
 import SuggestedMax from './SuggestedMax'
+import DestinationLpn from './DestinationLpn';
+import ToteLevel from './ToteLevel';
 
 const useStyles = theme => ({
     root: {
@@ -171,30 +169,14 @@ const Decanting = React.memo(() => {
 
                     <SuggestedMax />
 
-                    <FormLabel component="legend">Tote Level</FormLabel>
-                    <RadioGroup row aria-label="Tote Level" name="tote-level">
-                        <FormControlLabel value="0" control={<Radio color="primary" />} label="Partial" />
-                        <FormControlLabel value="1" control={<Radio color="primary" />} label="Full" />
-                    </RadioGroup>
+                    <ToteLevel />
     
                 </Grid>          
             </Grid>
             <Grid container spacing={3}>
                 <Grid item xs={8}>
                 <LoadingIndicator/>
-                <TextField 
-                        id="destination-lpn"
-                        label="Destination Pallet LPN"
-                        style={{ margin: 8 }}
-                        fullWidth
-                        margin="normal"
-                        InputLabelProps={{
-                            shrink: true,
-                        }}
-                        variant="outlined"
-                        multiline
-                        required
-                    />
+              <DestinationLpn />
 
                 <TextField 
                         id="decanting-instructions"

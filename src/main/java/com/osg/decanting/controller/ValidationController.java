@@ -9,12 +9,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.google.gson.Gson;
+import com.osg.decanting.model.DecantingMove;
 import com.osg.decanting.services.PutawayToteInterface;
 import com.redprairie.moca.MocaException;
 import com.redprairie.moca.MocaResults;
@@ -155,9 +159,29 @@ public class ValidationController {
 	        return conn;
 	    }
 	 
-	 
-
-	 
-	
+	 @PostMapping("/moveInventory")
+		public @ResponseBody  String moveInventory(@RequestBody DecantingMove decantingMove)throws MocaException, IOException {
+		 	String jsonString ="";
+		 	Gson gson = new Gson();
+		 	 MocaConnection conn =null;
+		 	 try {
+		 		 conn = establishMocaConnection();
+		 		 String command = "tosg decanting item move inventory where lodnum = '" + decantingMove.getLodnum() + "' and prtnum ='" + decantingMove.getItem() + "' and wh_id ='" + decantingMove.getWarehouseId() + "' and untqty ='" + decantingMove.getSuggestedToteMax() +  "' and dstlod='" + decantingMove.getDestinationLpn() +"'";
+			 	 MocaResults res = conn.executeCommand(command);
+		 	 }catch (MocaException e) {
+		            String errorMessage = e.getMessage();
+		            return errorMessage;
+		        }catch(Exception ex) {
+		        	ex.printStackTrace();
+		        	return "Error";
+		        }
+		        finally {
+		            if (conn != null) conn.close();
+		        }
+		 	
+		 	System.out.println("request " + jsonString);
+		 	return "success";
+		 
+		}
 
 }
