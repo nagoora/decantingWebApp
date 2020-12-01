@@ -43,9 +43,9 @@ const useStyles = makeStyles((theme) => ({
       <DialogContent>
         <DialogContentText id="alert-dialog-description">
 
-        <Alert variant="outlined" severity="success">
+        <Alert variant="filled" severity="success">
             <AlertTitle><strong>Success</strong></AlertTitle>
-            Item has been decanted successfully !
+            <strong>Item has been decanted successfully !</strong>
         </Alert>
 
         </DialogContentText>

@@ -72,7 +72,7 @@ export default function AlertDialog() {
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogTitle id="alert-dialog-title">{"Move Inventory?"}</DialogTitle>
+        <DialogTitle id="alert-dialog-title">{"Move Inventory"}</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
             Are you sure you want to move {state.suggestedToteMax} into {state.destinationLpn} ?

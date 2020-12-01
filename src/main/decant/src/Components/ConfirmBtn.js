@@ -13,6 +13,7 @@ const ConfirmBtn = React.memo(() => {
     const [state, dispatch] = useGlobalState();
 
     const handleClickModalOpen = () => {
+        debugger;
         if(!state.destinationLpn){
             dispatch({destinationLpnError: true, destinationLpnErrorMsg: "Destination LPN required"})
         }else{

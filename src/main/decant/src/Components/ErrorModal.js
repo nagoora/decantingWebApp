@@ -38,7 +38,7 @@ const useStyles = makeStyles((theme) => ({
       <DialogContent>
         <DialogContentText id="alert-dialog-description">
 
-        <Alert variant="outlined" severity="error">
+        <Alert variant="filled" severity="error">
             <AlertTitle>Error</AlertTitle>
             <strong>{state.errorMessage}</strong>
         </Alert>
