@@ -7,6 +7,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import {useGlobalState} from '../App';
+import { trackPromise } from 'react-promise-tracker'
 
 
 export default function AlertDialog() {
@@ -18,7 +19,13 @@ export default function AlertDialog() {
   };
 
   const handleConfirmMoveInventory = () => {
-    axios.post("/decanting/moveInventory", state)
+    trackPromise(axios.post("/decanting/moveInventory", state, {
+      headers : {
+          'username' : localStorage.getItem("userName"),
+          'password' : localStorage.getItem("password")
+      },withCredentials: true ,
+      credentials: 'include',
+  })
     .then((response) =>{
         console.log("Request POSTED ", JSON.stringify(response.data))
         if(response.data === "success"){
@@ -53,9 +60,9 @@ export default function AlertDialog() {
             dispatch({modalDialogOpen: false})
             dispatch({errorModal: true, errorMessage: JSON.stringify(response.data)})
         }
-    })
+    }))
 
-  };
+  }
 
   const getSuccessCountTimeout = () => {
     setTimeout(() => {

@@ -62,6 +62,4 @@ public class DecantingMove {
 		this.destinationLpn = destinationLpn;
 	}
 	
-	
-	
 }

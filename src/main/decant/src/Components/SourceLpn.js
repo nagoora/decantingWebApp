@@ -21,7 +21,9 @@ const SourceLpn = React.memo(() => {
             headers : {
                 'Content-Type': 'application/x-www-form-urlencoded',
                 'Access-Control-Allow-Origin' : 'http://localhost:3000',
-                'Access-Control-Allow-Credentials' : true
+                'Access-Control-Allow-Credentials' : true,
+                'username' : localStorage.getItem("userName"),
+                'password' : localStorage.getItem("password")
             },withCredentials: true ,
             credentials: 'include',
         }).then((response) =>{
@@ -60,8 +62,6 @@ const SourceLpn = React.memo(() => {
                 error={state.lodnumError}
                 helperText={state.lodnumError ? 'Invalid Source Pallet LPN' : ''}
                 required
-                onChange={handleSourceLpnChange}
-                value={state.lodnum}
 
 
             />

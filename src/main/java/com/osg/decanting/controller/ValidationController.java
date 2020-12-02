@@ -8,9 +8,11 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.Gson;
 import com.osg.decanting.model.DecantingMove;
+import com.osg.decanting.services.DecantingExceptionInterface;
 import com.osg.decanting.services.PutawayToteInterface;
 import com.redprairie.moca.MocaException;
 import com.redprairie.moca.MocaResults;
@@ -26,7 +29,6 @@ import com.redprairie.moca.client.ConnectionUtils;
 import com.redprairie.moca.client.MocaConnection;
 
 import net.minidev.json.JSONObject;
-
 
 @RestController
 @RequestMapping("/decanting")
@@ -38,14 +40,16 @@ public class ValidationController {
 	@Autowired
 	private PutawayToteInterface putawayToteInterface;	
 	
+	@Autowired
+	private DecantingExceptionInterface decantingExceptionInterface;
+	
 	@GetMapping("/ws/cws/tosgGetInventoryIdentifierDetails")
-	public JSONObject tosgGetInventoryIdentifierDetails(@RequestParam(name="srclpn") String srclpn, HttpServletRequest request)throws MocaException {
+	public JSONObject tosgGetInventoryIdentifierDetails(@RequestParam(name="srclpn") String srclpn, HttpServletRequest request, @RequestHeader MultiValueMap<String, String> headers)throws MocaException {
 		MocaConnection conn = null;
 		JSONObject response = new JSONObject();
-
 		try {
-			 conn = establishMocaConnection();
-			 System.out.println("Wharehouse ID for this sesion is " + request.getAttribute("wh_id"));
+			conn = establishMocaConnection(headers.getFirst("username"), headers.getFirst("password"));
+			 System.out.println("Warehouse ID for this sesion is " + request.getAttribute("wh_id"));
 			 MocaResults res = conn.executeCommand("get tosg inventory identifier details where id = '" + srclpn + "'");
 			 while (res.next()) {
 				 JSONObject responseRow = new JSONObject();
@@ -67,15 +71,16 @@ public class ValidationController {
 	@GetMapping("/ws/cws/tosgGetItemQtyOnLodnum")
 	public JSONObject tosgGetItemQtyOnLodnum(@RequestParam(name="lodnum") String lodnum, 
 			@RequestParam(name="prtnum") String prtnum,
-			@RequestParam(name="wh_id") String wh_id)throws MocaException {
+			@RequestParam(name="wh_id") String wh_id,
+			@RequestHeader MultiValueMap<String, String> headers)throws MocaException {
 		MocaConnection conn = null;
 		JSONObject response = new JSONObject();
 		try {
-			 conn = establishMocaConnection();
+			conn = establishMocaConnection(headers.getFirst("username"), headers.getFirst("password"));
 			 MocaResults res = conn.executeCommand("tosg get decanting item data where lodnum = '" + lodnum + "' and prtnum ='" + prtnum + "' and wh_id ='" + wh_id + "'");
 			 while (res.next()) {
 				 JSONObject responseRow = new JSONObject();
-				 HashMap<String, String> toteMaxDetails = getToteAndMaxUnits(res.getString("tote"), wh_id, res.getString("prtnum"));
+				 HashMap<String, String> toteMaxDetails = getToteAndMaxUnits(res.getString("tote"), wh_id, res.getString("prtnum"), conn);
 				 
 				 responseRow.put("prtnum", res.getString("prtnum"));
 				 responseRow.put("lodnum", res.getString("lodnum"));
@@ -111,12 +116,10 @@ public class ValidationController {
 		return response;
 	}
 	
-	public HashMap<String, String> getToteAndMaxUnits(String tote, String whId, String prtnum){
-		MocaConnection conn = null;
+	public HashMap<String, String> getToteAndMaxUnits(String tote, String whId, String prtnum, MocaConnection conn){
 		HashMap<String, String> response = new  HashMap<String, String>();
 		
 		try {
-			 conn = establishMocaConnection();
 			 MocaResults res = conn.executeCommand("tosg get asset suggested max units where asset_typ = '" + tote + "' and prtnum ='" + prtnum + "' and wh_id ='" + whId + "'");
 			 while (res.next()) {
 				 response.put("prtnum", res.getString("prtnum"));
@@ -131,41 +134,26 @@ public class ValidationController {
         }catch(Exception ex) {
         	ex.printStackTrace();
         }
-        finally {
-            if (conn != null) conn.close();
-        }
+		
 		return response;
 	}
 	
 	
 	@RequestMapping(value = "/ws/cws/tosgListPutawayTotes", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE )
-	public @ResponseBody  String tosgListPutawayTotes(@RequestParam(name="wh_id") String wh_id)throws MocaException, IOException {
+	public @ResponseBody  String tosgListPutawayTotes(@RequestParam(name="wh_id") String wh_id, @RequestHeader MultiValueMap<String, String> headers)throws MocaException, IOException {
 
-		String putawayToteList = putawayToteInterface.findAll(wh_id);
+		String putawayToteList = putawayToteInterface.findAll(wh_id,headers.getFirst("username"), headers.getFirst("password"));
 		return putawayToteList;
 	}
 	
-	 public MocaConnection establishMocaConnection(){
-	        MocaConnection conn =null;
-	        try{
-	            conn = ConnectionUtils.createConnection(byurl, null);
-	            ConnectionUtils.login(conn, "anagoor", "Crate123");
-	        }catch(MocaException e){
-	            int errorCode = e.getErrorCode();
-	            String errorMessage = e.getMessage();
-	            e.printStackTrace();
-	        }
-
-	        return conn;
-	    }
 	 
 	 @PostMapping("/moveInventory")
-		public @ResponseBody  String moveInventory(@RequestBody DecantingMove decantingMove)throws MocaException, IOException {
+		public @ResponseBody  String moveInventory(@RequestBody DecantingMove decantingMove, HttpServletRequest request)throws MocaException, IOException {
 		 	String jsonString ="";
 		 	Gson gson = new Gson();
 		 	 MocaConnection conn =null;
 		 	 try {
-		 		 conn = establishMocaConnection();
+		 		 conn = establishMocaConnection(request.getHeader("username"), request.getHeader("password"));
 		 		 String command = "tosg decanting item move inventory where lodnum = '" + decantingMove.getLodnum() + "' and prtnum ='" + decantingMove.getItem() + "' and wh_id ='" + decantingMove.getWarehouseId() + "' and untqty ='" + decantingMove.getSuggestedToteMax() +  "' and dstlod='" + decantingMove.getDestinationLpn() +"'";
 			 	 MocaResults res = conn.executeCommand(command);
 		 	 }catch (MocaException e) {
@@ -183,5 +171,34 @@ public class ValidationController {
 		 	return "success";
 		 
 		}
+	 
+	 @RequestMapping(value={"/ws/auth/login"})
+		public String loginDefault(@RequestParam(name="usr_id") String userName, @RequestParam(name="password") String password) throws MocaException {
+			MocaConnection conn = establishMocaConnection(userName, password);
+			Gson gson = new Gson(); 
+			String connectionEnvironmentVariables = gson.toJson(conn.getEnvironment()); 
+			return connectionEnvironmentVariables;
+	}
+	 
+	 @RequestMapping(value = "/ws/cws/tosgGetDecantingExceptionList", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE )
+		public @ResponseBody  String tosgGetDecantingExceptionList(@RequestParam(name="reagrp") String reagrp, @RequestHeader MultiValueMap<String, String> headers)throws MocaException, IOException {
+
+			String decantingExceptionList = decantingExceptionInterface.findAll(reagrp,headers.getFirst("username"), headers.getFirst("password"));
+			return decantingExceptionList;
+		}
+		
+		 public MocaConnection establishMocaConnection(String userName, String password){
+		        MocaConnection conn =null;
+		        try{
+		            conn = ConnectionUtils.createConnection(byurl, null);
+		            ConnectionUtils.login(conn, userName, password);
+		        }catch(MocaException e){
+		            int errorCode = e.getErrorCode();
+		            String errorMessage = e.getMessage();
+		            e.printStackTrace();
+		        }
+
+		        return conn;
+		    }
 
 }

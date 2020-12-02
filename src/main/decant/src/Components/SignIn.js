@@ -6,10 +6,13 @@ import Button from '@material-ui/core/Button';
 import AuthApi from '../Services/AuthApi'
 import Cookies from 'js-cookie';
 import { useCookies } from 'react-cookie';
+import {useGlobalState} from '../App';
+import AlertDisplay from './AlertDisplay';
 
 function SignIn() {
     const [userName, setUserName] = useState("");
     const [password, setPassWord] = useState("");
+    const [state, dispatch] = useGlobalState();
 
     const handleUserNameChange = (e) => {
         setUserName(e.target.value);
@@ -24,18 +27,41 @@ function SignIn() {
     
     const handleSubmit = (e) => {
         e.preventDefault();
-        axios.get(`/ws/auth/login?usr_id=${userName}&password=${password}`,{
-            headers : {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'Access-Control-Allow-Origin' : 'http://localhost:3000',
-            }
-          }, {timeout: 100}).then((response) =>{
-                console.log("Authenticated ");
-                Auth.setAuth(true);
-                Cookies.set("user", "loginTrue");
+        axios.get("/decanting/ws/auth/login?usr_id="+ userName+"&password="+password,{
+            headers: {
+                'Access-Control-Allow-Origin' : '*',
+                'Access-Control-Allow-Credentials' : true
+            }, withCredentials: true ,
+            credentials: 'include'
+        })
+                .then((response) =>{
+                    console.log(response.data);
+                    Cookies.set("user", "loginTrue");
+                    localStorage.setItem("userName", userName);
+                    localStorage.setItem("password", password);
+                    console.log("Authenticated ");
+                    Auth.setAuth(true);
+                    dispatch(
+                        {
+                            alertShow:false,
+                            alertSeverity:"",
+                            alertMessage:"",
+                        }
+                    )
+                    
             })
             .catch((error) => {
+                    debugger;
                     console.log({error}) // this will log an empty object with an error property
+                    Auth.setAuth(false);
+                    Cookies.remove("user");
+                    dispatch(
+                        {
+                            alertShow:true,
+                            alertSeverity:"error",
+                            alertMessage:"There was an issue logging you into Decanting.",
+                        }
+                    )
                 });
     }
 
@@ -78,6 +104,7 @@ function SignIn() {
                         <Button variant="contained" color="primary" onClick={handleSubmit} style={{ margin: 15 }}>
                             Login
                         </Button>
+                        <AlertDisplay />
                     </div>
                 </form>
             </Container>

@@ -21,14 +21,14 @@ public class PutawayToteService implements PutawayToteInterface {
 	private String byurl;
 
 	@Override
-	public String findAll(String wh_id) throws IOException {
+	public String findAll(String wh_id, String username, String password) throws IOException {
 		MocaConnection conn = null;
 		ArrayList<PutawayTote> responseArray = new ArrayList<PutawayTote>();
 		PutawayToteList plt = new PutawayToteList();
 		String jsonString ="";
 		Gson gson = new Gson();
 		try {
-			conn = establishMocaConnection();
+			conn = establishMocaConnection(username, password);
 			MocaResults res = conn.executeCommand("tosg list putaway totes where wh_id = '" + wh_id + "'");
 
 			 while(res.next()) { 
@@ -58,11 +58,11 @@ public class PutawayToteService implements PutawayToteInterface {
 		return jsonString;
 	}
 
-	public MocaConnection establishMocaConnection() {
+	public MocaConnection establishMocaConnection(String username, String password) {
 		MocaConnection conn = null;
 		try {
 			conn = ConnectionUtils.createConnection(byurl, null);
-			ConnectionUtils.login(conn, "anagoor", "Crate123");
+			ConnectionUtils.login(conn, username, password);
 		} catch (MocaException e) {
 			int errorCode = e.getErrorCode();
 			String errorMessage = e.getMessage();

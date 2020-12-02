@@ -43,7 +43,9 @@ const Item = React.memo(() => {
             headers : {
                 'Content-Type': 'application/x-www-form-urlencoded',
                 'Access-Control-Allow-Origin' : 'http://localhost:3000',
-                'Access-Control-Allow-Credentials' : true
+                'Access-Control-Allow-Credentials' : true,
+                'username' : localStorage.getItem("userName"),
+                'password' : localStorage.getItem("password")
             },withCredentials: true ,
             credentials: 'include',
         }).then((response) =>{
@@ -134,7 +136,6 @@ const Item = React.memo(() => {
         error={state.itemError}
         helperText={state.itemError ? 'Invalid Item' : ''}
         value={state.item}
-        onChange={handleItemChange}
 
     />
 

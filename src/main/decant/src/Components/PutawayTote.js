@@ -13,20 +13,20 @@ const PutawayTote = React.memo(() => {
   const [allPutawayTotes, setAllPutawayTotes] = useState([]);
   const [selectedTote, setSelectedTote] = useState("");
   const [state, dispatch] = useGlobalState();
-  let putawayToteOptions =[];
-  const [loading, setLoading] = useState(true);
 
   useEffect(() =>{
     console.log(" useEffect of PutawayTote gets called")
-    axios.get('/decanting/ws/cws/tosgListPutawayTotes?wh_id=WIAW' ,{
-      withCredentials: true ,
-      credentials: 'include'
-    }).then((response) => {
+    axios.get('/decanting/ws/cws/tosgListPutawayTotes?wh_id=WIAW' , {
+      headers : {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Access-Control-Allow-Origin' : 'http://localhost:3000',
+          'Access-Control-Allow-Credentials' : true,
+          'username' : localStorage.getItem("userName"),
+          'password' : localStorage.getItem("password")
+      },withCredentials: true ,
+      credentials: 'include',
+  }).then((response) => {
       setAllPutawayTotes(response.data.putawayTote);
-      putawayToteOptions = response.data.putawayTote.map(function(tote, index) {
-                                                        return {key:tote.asset_typ, value:tote.lngdsc};
-                            })
-                            setLoading(false);
 
     })
 },[]);
@@ -48,7 +48,7 @@ const PutawayTote = React.memo(() => {
                 name="suggestedTote"
                 label="Suggested Tote*"
                 onChange={handelPutatwayToteChange}
-                value={state.suggestedTote === null ? "" : state.suggestedTote}
+                value={state.suggestedTote ? state.suggestedTote : ""}
                 >
                   {allPutawayTotes.map(tote => {
                       return(

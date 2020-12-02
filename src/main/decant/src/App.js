@@ -1,6 +1,10 @@
 import './App.css';
 import Decanting from './Components/Decanting'
 import * as React from "react";
+import Cookies from 'js-cookie';
+import {BrowserRouter, Switch, Route, Redirect} from 'react-router-dom';
+import AuthApi from './Services/AuthApi';
+import SignIn from './Components/SignIn'
 
 const initialGlobalState = {
   warehouseId: 'WIAW',
@@ -28,7 +32,11 @@ const initialGlobalState = {
   toteLevel:'',
   successModal:false,
   errorModal:false,
-  errorMessage:''
+  errorMessage:'',
+  alertShow:false,
+  alertSeverity:"",
+  alertMessage:"",
+  exception:"",
 };
 
 export const GlobalStateContext = React.createContext(initialGlobalState);
@@ -58,11 +66,69 @@ React.useContext(DispatchStateContext)
 
 export const App = () =>{
 
+  const [auth, setAuth] = React.useState(false);
+  const readCookie =() =>{
+  const user = Cookies.get("user");
+    if(user){
+      setAuth(true);
+    }
+  }
+
+  React.useEffect (()=> {
+    readCookie();
+  }, [])
+
   return (
+
     <GlobalStateProvider>
       <div className="App">
-        <Decanting />
+      <AuthApi.Provider value={{auth, setAuth}}>
+        <BrowserRouter>
+          <Routes />
+        </BrowserRouter>
+      </AuthApi.Provider>
       </div>
-    </GlobalStateProvider>
+      </GlobalStateProvider>    
+    
   );
+}
+
+const Routes =() => {
+  const Auth = React.useContext(AuthApi);
+  return(
+    <Switch>
+      <ProtectedRoute exact path='/Decanting' auth={Auth.auth} component={Decanting} />
+      <ProtectedLogin path='/Signin' auth={Auth.auth} component={SignIn} />
+  </Switch>
+  )
+}
+
+const ProtectedRoute = ({auth, component:Component, ...rest}) => {
+  return(
+    <Route 
+      {...rest}
+      render ={()=> auth ? (
+        <Component />
+        ) :
+        (
+          <Redirect to='/Signin' />
+        )
+      }
+    />
+  )
+}
+
+const ProtectedLogin = ({auth, component:Component, ...rest}) => {
+  return(
+    <Route 
+      {...rest}
+      render ={()=> !auth ? (
+        <Component />
+        ) :
+        (
+          <Redirect to='/Decanting' />
+        )
+      }
+    />
+  )
 }

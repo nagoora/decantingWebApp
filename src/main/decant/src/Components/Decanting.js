@@ -15,6 +15,9 @@ import {useGlobalState} from '../App';
 import SuggestedMax from './SuggestedMax'
 import DestinationLpn from './DestinationLpn';
 import ToteLevel from './ToteLevel';
+import LogoutBtn from './LogoutBtn';
+import ExceptionDialogBtn from './ExceptionDialog';
+import AlertDisplay from './AlertDisplay';
 
 const useStyles = theme => ({
     root: {
@@ -176,7 +179,7 @@ const Decanting = React.memo(() => {
             <Grid container spacing={3}>
                 <Grid item xs={8}>
                 <LoadingIndicator/>
-              <DestinationLpn />
+                <DestinationLpn />
 
                 <TextField 
                         id="decanting-instructions"
@@ -207,8 +210,17 @@ const Decanting = React.memo(() => {
                         
                     />
                 </Grid>
-                <ConfirmBtn />
+                <Grid item xs={2}>
+                    <ConfirmBtn />
+                    <LogoutBtn />
+                    <ExceptionDialogBtn />
+                </Grid>
+                <Grid item xs={10}>
+                    <AlertDisplay />
+                </Grid>
+                
             </Grid>
+            
         </Container>
         )
     }
