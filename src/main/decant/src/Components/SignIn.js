@@ -36,18 +36,33 @@ function SignIn() {
         })
                 .then((response) =>{
                     console.log(response.data);
-                    Cookies.set("user", "loginTrue");
-                    localStorage.setItem("userName", userName);
-                    localStorage.setItem("password", password);
-                    console.log("Authenticated ");
-                    Auth.setAuth(true);
-                    dispatch(
-                        {
-                            alertShow:false,
-                            alertSeverity:"",
-                            alertMessage:"",
-                        }
-                    )
+                    if(response.data.USR_ID){
+                        Cookies.set("user", "loginTrue");
+                        localStorage.setItem("userName", userName);
+                        localStorage.setItem("password", password);
+                        console.log("Authenticated ");
+                        Auth.setAuth(true);
+                        dispatch(
+                            {
+                                alertShow:false,
+                                alertSeverity:"",
+                                alertMessage:"",
+                            }
+                        )
+                    }else{
+                         // this will log an empty object with an error property
+                        console.log("Not Authenticated ");
+                        Auth.setAuth(false);
+                        Cookies.remove("user");
+                        dispatch(
+                            {
+                                alertShow:true,
+                                alertSeverity:"error",
+                                alertMessage:"There was an issue logging you into Decanting.",
+                            }
+                        )
+                    }
+                    
                     
             })
             .catch((error) => {

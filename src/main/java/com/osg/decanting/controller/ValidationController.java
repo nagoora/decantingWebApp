@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.Gson;
+import com.osg.decanting.model.DecantingException;
 import com.osg.decanting.model.DecantingMove;
 import com.osg.decanting.services.DecantingExceptionInterface;
 import com.osg.decanting.services.PutawayToteInterface;
@@ -146,6 +147,13 @@ public class ValidationController {
 		return putawayToteList;
 	}
 	
+	@PostMapping("/ws/cws/logDecantingException")
+	public @ResponseBody String logDecantingException(@RequestBody DecantingException logDecantingException,HttpServletRequest request ) {
+		
+		String decantingExceptionStatus = decantingExceptionInterface.save(request.getHeader("warehouseId"), "DECANT", request.getHeader("username"), request.getHeader("password"), logDecantingException.getReacod(), logDecantingException.getSrclod(), logDecantingException.getPrtnum());
+		return decantingExceptionStatus;
+	}
+	
 	 
 	 @PostMapping("/moveInventory")
 		public @ResponseBody  String moveInventory(@RequestBody DecantingMove decantingMove, HttpServletRequest request)throws MocaException, IOException {
@@ -177,7 +185,12 @@ public class ValidationController {
 			MocaConnection conn = establishMocaConnection(userName, password);
 			Gson gson = new Gson(); 
 			String connectionEnvironmentVariables = gson.toJson(conn.getEnvironment()); 
-			return connectionEnvironmentVariables;
+			if(connectionEnvironmentVariables.equalsIgnoreCase("{}") || connectionEnvironmentVariables.equalsIgnoreCase(""))  {
+				return null;
+			}else {
+				return connectionEnvironmentVariables;
+			}
+			
 	}
 	 
 	 @RequestMapping(value = "/ws/cws/tosgGetDecantingExceptionList", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE )

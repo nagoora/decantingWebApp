@@ -52,6 +52,29 @@ public class DecantingExceptionService implements DecantingExceptionInterface{
 		return jsonString;
 	}
 	
+
+
+	@Override
+	public String save(String whId, String reagrp, String userName, String password, String reacod, String srclod, String prtnum) {
+		MocaConnection conn = null;
+		try {
+			conn = establishMocaConnection(userName, password);
+			String command = "tosg log decanting exception where reagrp = '" + reagrp + "' and userName = '" + userName + "' and password = '" + password + "' and reacod = '" + reacod + "' and srclod = '" + srclod + "' and prtnum = '" + prtnum + "' and wh_id = '" + whId + "'";
+			conn.executeCommand(command);
+			
+		}catch (MocaException e) {
+			e.printStackTrace();
+			return e.getMessage();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			return ex.getMessage();
+		} finally {
+			if (conn != null)
+				conn.close();
+		}
+		return "success";
+	}
+	
 	public MocaConnection establishMocaConnection(String username, String password) {
 		MocaConnection conn = null;
 		try {

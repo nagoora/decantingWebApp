@@ -39,6 +39,8 @@ const initialGlobalState = {
   exception:"",
 };
 
+
+
 export const GlobalStateContext = React.createContext(initialGlobalState);
 export const DispatchStateContext = React.createContext(undefined);
 

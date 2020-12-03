@@ -19,10 +19,25 @@ export default function TransitionAlerts() {
   const classes = useStyles();
   const [state, dispatch] = useGlobalState();
 
+  const acquireAlertColor = () => {
+    switch (state.alertSeverity) {
+      case "info":
+        return "blue";
+      case "error":
+        return "red";
+      case "warning":
+        return "orange";
+      case "success":
+          return "green";
+      default:
+        return "black";
+    }
+  };
+
   return (
     <div className={classes.root}>
       <Collapse in={state.alertShow}>
-        <Alert  severity={state.alertSeverity} variant="filled"
+        <Alert variant = "filled" severity={state.alertSeverity ? state.alertSeverity : "info" } 
           action={
             <IconButton
               aria-label="close"

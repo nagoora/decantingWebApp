@@ -136,6 +136,7 @@ const Item = React.memo(() => {
         error={state.itemError}
         helperText={state.itemError ? 'Invalid Item' : ''}
         value={state.item}
+        onChange={handleItemChange}
 
     />
 

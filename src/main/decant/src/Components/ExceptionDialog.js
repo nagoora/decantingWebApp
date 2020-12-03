@@ -12,6 +12,7 @@ import Divider from '@material-ui/core/Divider';
 import Box from '@material-ui/core/Box';
 import { blue } from '@material-ui/core/colors';
 import {useGlobalState} from '../App';
+import { trackPromise } from 'react-promise-tracker';
 
 const useStyles = makeStyles({
   avatar: {
@@ -84,7 +85,11 @@ export default function ExceptionDialogBtn() {
   
 
   const handleClickOpen = () => {
-    if(state.lodnum !== "" && state.item != ""){
+    if(state.lodnum !== "" && state.item !== ""){
+        console.log("lodnum ", state.lodnum );
+
+        console.log("item ", state.item);
+
         setOpen(true);
         dispatch(
             {
@@ -108,7 +113,51 @@ export default function ExceptionDialogBtn() {
   const handleClose = (value) => {
     setOpen(false);
     setSelectedValue(value);
+    logDecantingException(value, state.lodnum, state.item)
   };
+
+  const logDecantingException = (reacod, srclod, prtnum) => {
+    let decantingExceptionObj = {reacod: reacod, srclod: srclod, prtnum: prtnum};
+
+    console.log("decantingExceptionObj  " + decantingExceptionObj);
+    trackPromise(
+        axios.post("/decanting/ws/cws/logDecantingException", decantingExceptionObj, {
+            headers: {
+                'username' : localStorage.getItem("userName"),
+                'password' : localStorage.getItem("password"),
+                'warehouseId' : state.warehouseId
+            },withCredentials: true ,
+            credentials: 'include',
+        }).then((response) =>{
+            if(response.data === "success"){
+                dispatch(
+                    {
+                        alertShow:true,
+                        alertSeverity:"info",
+                        alertMessage:"Exception logged successfully for " + state.lodnum + "and Item# " + state.item,
+                    }
+                )
+            }else{
+                dispatch(
+                    {
+                        alertShow:true,
+                        alertSeverity:"error",
+                        alertMessage:"Please try again. Error logging exception for " + state.lodnum + "and Item# " + state.prtnum,
+                    }
+                )
+            }
+        })
+        .catch((error) => {
+            dispatch(
+                {
+                    alertShow:true,
+                    alertSeverity:"error",
+                    alertMessage:"Error" + error.data,
+                }
+            )
+        })
+    )
+  }
 
   return (
     <div>
@@ -116,7 +165,7 @@ export default function ExceptionDialogBtn() {
             <Button variant="outlined" color="primary" size="large" onClick={handleClickOpen}>
                 Exception
             </Button>
-            <ExceptionDialog selectedValue={selectedValue} open={open} onClose={handleClose} />
+            <ExceptionDialog selectedValue={selectedValue ? selectedValue : ""} open={open} onClose={handleClose} />
       </Box>
     </div>
   );
