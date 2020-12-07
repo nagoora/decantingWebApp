@@ -20,8 +20,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.osg.decanting.model.DecantingException;
 import com.osg.decanting.model.DecantingMove;
+import com.osg.decanting.model.User;
 import com.osg.decanting.services.DecantingExceptionInterface;
 import com.osg.decanting.services.PutawayToteInterface;
 import com.redprairie.moca.MocaException;
@@ -144,6 +146,7 @@ public class ValidationController {
 	public @ResponseBody  String tosgListPutawayTotes(@RequestParam(name="wh_id") String wh_id, @RequestHeader MultiValueMap<String, String> headers)throws MocaException, IOException {
 
 		String putawayToteList = putawayToteInterface.findAll(wh_id,headers.getFirst("username"), headers.getFirst("password"));
+		System.out.println("putawayToteList " + putawayToteList);
 		return putawayToteList;
 	}
 	
@@ -181,15 +184,61 @@ public class ValidationController {
 		}
 	 
 	 @RequestMapping(value={"/ws/auth/login"})
-		public String loginDefault(@RequestParam(name="usr_id") String userName, @RequestParam(name="password") String password) throws MocaException {
-			MocaConnection conn = establishMocaConnection(userName, password);
-			Gson gson = new Gson(); 
-			String connectionEnvironmentVariables = gson.toJson(conn.getEnvironment()); 
-			if(connectionEnvironmentVariables.equalsIgnoreCase("{}") || connectionEnvironmentVariables.equalsIgnoreCase(""))  {
-				return null;
-			}else {
-				return connectionEnvironmentVariables;
-			}
+		public User loginDefault(@RequestParam(name="usr_id") String userName, @RequestParam(name="password") String password) throws MocaException {
+			String warehouseId="";
+			User user = new User();
+			String connectionEnvironmentVariables ="";
+			MocaConnection conn=null;
+		 	try {
+				conn = establishMocaConnection(userName, password);
+				Gson gson = new Gson(); 
+				connectionEnvironmentVariables = gson.toJson(conn.getEnvironment()); 
+				JsonElement jsonElement = gson.toJsonTree(conn.getEnvironment());
+				user = gson.fromJson(jsonElement, User.class);
+				
+				if(connectionEnvironmentVariables.equalsIgnoreCase("{}") || connectionEnvironmentVariables.equalsIgnoreCase(""))  {
+					user.setStatus(false);
+					user.setStatusMessage("Error Connecting");
+				}else {
+					user.setUserName(userName);
+					user.setPassword(password);
+					user.setStatus(true);
+					user.setStatusMessage("Connection Successful");
+					String command = "get default user warehouse where usr_id ='" +userName+"'";
+					MocaResults res = conn.executeCommand(command);
+					
+					while(res.next()) {
+						user.setWarehouseId(res.getString("wh_id"));
+					}
+					
+					if(user.getWarehouseId() == null || user.getWarehouseId().isEmpty()) {
+						user.setStatus(false);
+			            user.setStatusMessage("Please assign a default warehouse for user " + user.getUserName());
+					}else {
+						user.setStatus(true);
+			            user.setStatusMessage("success");
+					}
+				}
+			} catch (MocaException e) {
+	            String errorMessage = e.getMessage();
+	            user.setStatus(false);
+	            user.setStatusMessage(errorMessage);
+	            return user;
+	        }catch(Exception ex) {
+	        	ex.printStackTrace();
+	        	user.setStatus(false);
+	        	user.setStatusMessage(ex.getMessage());
+		        return user;
+	        }
+	        finally {
+	            if (conn != null) {
+	            	ConnectionUtils.logout(conn);
+	            	conn.close();
+	            }
+	            
+	        }
+		 	
+		 	return user;
 			
 	}
 	 
@@ -205,6 +254,7 @@ public class ValidationController {
 		        try{
 		            conn = ConnectionUtils.createConnection(byurl, null);
 		            ConnectionUtils.login(conn, userName, password);
+		            
 		        }catch(MocaException e){
 		            int errorCode = e.getErrorCode();
 		            String errorMessage = e.getMessage();

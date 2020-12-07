@@ -1,20 +1,21 @@
 import React, {useEffect, useRef, useState} from 'react';
 import axios from 'axios';
 import TextField from '@material-ui/core/TextField';
-import AuthApi from '../Services/AuthApi'
-import Cookies from 'js-cookie';
 import { trackPromise } from 'react-promise-tracker'
 import {useGlobalState} from '../App';
 
 const Item = React.memo(() => {
 
     const [state, dispatch] = useGlobalState();
+    const itemTextInput = useRef(null);
+    
+    const handleItemOnChange = e => {
+        dispatch({item:e.target.value})
+    }
 
-
-    const handleItemChange =e =>{
+    const handleItemOnBlur =e =>{
         if(e.target.value!=""){
           validateItem(e.target.value);
-          
         }else{
             dispatch(
                 {
@@ -39,7 +40,7 @@ const Item = React.memo(() => {
 
     const validateItem = (item) =>{
         trackPromise(
-          axios.get('/decanting/ws/cws/tosgGetItemQtyOnLodnum?lodnum=' + state.lodnum +'&prtnum='+ item +'&wh_id=WIAW',{
+          axios.get('/decanting/ws/cws/tosgGetItemQtyOnLodnum?lodnum=' + state.lodnum +'&prtnum='+ item +'&wh_id='+localStorage.getItem("warehouseId"),{
             headers : {
                 'Content-Type': 'application/x-www-form-urlencoded',
                 'Access-Control-Allow-Origin' : 'http://localhost:3000',
@@ -76,9 +77,9 @@ const Item = React.memo(() => {
                 }
     
                 }else{
+                    itemTextInput.current.focus();
                     dispatch(
                         {
-                            item:item,
                             itemError :true,
                             itemDescription:'',
                             itemImage:'',
@@ -87,6 +88,8 @@ const Item = React.memo(() => {
                             destinationZone:'',
                             suggestedTote : '',
                             suggestedToteMax:'',
+                            suggestedToteMaxError: false,
+                            suggestedToteMaxErrorMsg:'',
                             assetWgt: '',
                             wrappingType: '',
                             decantingInstructions:'',
@@ -98,9 +101,9 @@ const Item = React.memo(() => {
                 })
             .catch((error) => {
                 console.log("ERROR CATCH PART" + error);
+                itemTextInput.current.focus();
                 dispatch(
                     {
-                        item:item,
                         itemError :true,
                         itemDescription:'',
                         itemImage:'',
@@ -109,6 +112,8 @@ const Item = React.memo(() => {
                         destinationZone:'',
                         suggestedTote : '',
                         suggestedToteMax:'',
+                        suggestedToteMaxError: false,
+                        suggestedToteMaxErrorMsg:'',
                         assetWgt: '',
                         wrappingType: '',
                         decantingInstructions:'',
@@ -132,11 +137,12 @@ const Item = React.memo(() => {
         }}
         variant="outlined"
         required
-        onBlur={handleItemChange}
+        onBlur={handleItemOnBlur}
         error={state.itemError}
         helperText={state.itemError ? 'Invalid Item' : ''}
         value={state.item}
-        onChange={handleItemChange}
+        onChange={handleItemOnChange}
+        inputRef={itemTextInput}
 
     />
 

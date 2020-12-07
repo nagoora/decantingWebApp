@@ -6,7 +6,7 @@ import {useGlobalState} from '../App';
 const SuggestedMax = React.memo(() => {
 
     const [state, dispatch] = useGlobalState();
-    let textInput = useRef(null);
+    let suggestedMaxTextInput = useRef(null);
 
     const handleSuggestedMaxChange =(e) => {
         if(parseInt(e.target.value) > parseInt(state.totalUnits)){
@@ -18,11 +18,11 @@ const SuggestedMax = React.memo(() => {
     }
 
     useEffect(() =>{
-        if(state.item !== '' && !state.itemError){
-            textInput.current.focus();
+        if(state.suggestedToteMax !== ''){
+            suggestedMaxTextInput.current.focus();
         }
         
-    },[state.item]);
+    },[state.suggestedToteMax]);
 
     return(
         <TextField
@@ -42,7 +42,7 @@ const SuggestedMax = React.memo(() => {
             helperText={state.suggestedToteMaxErrorMsg}
             onChange={handleSuggestedMaxChange}
             onBlur={handleSuggestedMaxChange}
-            inputRef={textInput}
+            inputRef={suggestedMaxTextInput}
             
         />
     )

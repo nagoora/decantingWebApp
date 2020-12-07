@@ -26,6 +26,7 @@ const PutawayTote = React.memo(() => {
       },withCredentials: true ,
       credentials: 'include',
   }).then((response) => {
+      console.log(response.data.putawayTote);
       setAllPutawayTotes(response.data.putawayTote);
 
     })

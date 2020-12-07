@@ -36,12 +36,15 @@ function SignIn() {
         })
                 .then((response) =>{
                     console.log(response.data);
-                    if(response.data.USR_ID){
+                    debugger;
+                    if(response.data.warehouseId){
                         Cookies.set("user", "loginTrue");
                         localStorage.setItem("userName", userName);
                         localStorage.setItem("password", password);
+                        localStorage.setItem("warehouseId", response.data.warehouseId);
                         console.log("Authenticated ");
                         Auth.setAuth(true);
+                        dispatch({warehouseId: response.data.warehouseId})
                         dispatch(
                             {
                                 alertShow:false,
@@ -58,7 +61,7 @@ function SignIn() {
                             {
                                 alertShow:true,
                                 alertSeverity:"error",
-                                alertMessage:"There was an issue logging you into Decanting.",
+                                alertMessage:response.data.statusMessage,
                             }
                         )
                     }

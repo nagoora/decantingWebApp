@@ -113,7 +113,10 @@ export default function ExceptionDialogBtn() {
   const handleClose = (value) => {
     setOpen(false);
     setSelectedValue(value);
-    logDecantingException(value, state.lodnum, state.item)
+    if(value){
+      logDecantingException(value, state.lodnum, state.item)
+    }
+    
   };
 
   const logDecantingException = (reacod, srclod, prtnum) => {

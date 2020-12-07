@@ -7,7 +7,7 @@ import AuthApi from './Services/AuthApi';
 import SignIn from './Components/SignIn'
 
 const initialGlobalState = {
-  warehouseId: 'WIAW',
+  warehouseId: '',
   lodnum:'',
   lodnumError: false,
   item:'',
